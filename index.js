@@ -39,19 +39,45 @@ class Player {
     }
 }
 
+class Projectile{
+    constructor(position, velocity){
+        this.position = position;
+        this.velocity = velocity;
+        this.radius = 5
+    }
+    draw(){
+        c.beginPath();
+        c.arc(this.position.x, this.position.y, this.radius, 0, 2*Math.PI)
+        c.fillStyle = "red"
+        c.fill()
+    }
+
+    update(){
+        this.position.x  += this.velocity.x;
+        this.position.y  += this.velocity.y;
+        this.draw()
+    }
+}
+
 let player = new Player();
+let projectiles =  [];
 let keys = {
     arrowRight :{
         pressed: false
     },
     arrowLeft :{
         pressed:false
-    }
+    },
 }
 const animate = () =>{
     requestAnimationFrame(animate)
     player.update();
-
+    projectiles.forEach((projectile, index) => {
+        if(projectile.position.y + projectile.radius < 0){
+            projectiles.splice(index, 1)
+        }
+        projectile.update()
+    })
     if(keys.arrowRight.pressed && (player.width + player.position.x <= canvas.width)){
         player.velocity.x = 5;
     }else if(keys.arrowLeft.pressed && player.position.x >= 0){
@@ -71,6 +97,9 @@ addEventListener(("keydown"), ({key}) => {
             keys.arrowLeft.pressed = true;
             player.update()
             break;
+        case " ":
+            projectiles.push(new Projectile({x: player.position.x + player.width/2, y:player.position.y}, {x:0, y: -5}))
+            break;
         default:
         break;
     }
@@ -85,6 +114,8 @@ addEventListener(("keyup"), ({key}) => {
         case "ArrowLeft":
             keys.arrowLeft.pressed = false;
             player.update()
+            break;
+        case " ":
             break;
         default:
         break;
