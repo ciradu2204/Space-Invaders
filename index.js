@@ -40,7 +40,7 @@ class Player {
 }
 
 class Invader{
-    constructor(){
+    constructor(position){
         this.velocity = {
             x: 0,
             y: 0,
@@ -55,19 +55,51 @@ class Invader{
             this.width = this.image.width;
             this.height = this.image.height;
             this.position = {
-                x: canvas.width/2 - this.width/2,
-                y: canvas.height/2
+                x: position.x,
+                y: position.y
             }
         }
     }
     draw(){
         c.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
     }
-    update(){
+    update(velocity){
         if(this.image){
-            this.position.x  += this.velocity.x;
-            this.position.y += this.velocity.y
+            this.position.x  += velocity.x;
+            this.position.y += velocity.y
             this.draw()
+
+        }
+    }
+}
+
+class Grid {
+    constructor(){
+        this.position = {
+            x: 0,
+            y: 0
+        }
+        this.velocity = {
+            x:3,
+            y:0,
+        }
+        this.invaders = [];
+        const rows = Math.floor(Math.random() * 5 + 2)
+        const columns = Math.floor(Math.random()* 10 + 2)
+        this.width = columns * 30;
+        for(let i=0; i<columns; i++){
+            for(let x=0; x<rows; x++){
+               this.invaders.push(new Invader({x: i*30, y: x*30}))
+            }
+        }
+    }
+    update(){
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+        this.velocity.y = 0
+        if(this.position.x + this.width >= canvas.width || this.position.x <=0){
+            this.velocity.x = -this.velocity.x
+            this.velocity.y = 30
         }
     }
 }
@@ -91,10 +123,10 @@ class Projectile{
     }
 }
 
-let player = new Player();
-let projectiles =  [];
-let invader = new Invader()
-let keys = {
+const player = new Player();
+const projectiles =  [];
+const grids = []
+const keys = {
     arrowRight :{
         pressed: false
     },
@@ -102,10 +134,17 @@ let keys = {
         pressed:false
     },
 }
+let frames = 0;
+let randomInterval = Math.floor(Math.random() * 500 + 500)
 const animate = () =>{
     requestAnimationFrame(animate)
     player.update();
-    invader.update();
+    grids.forEach((grid) => {
+        grid.invaders.forEach((invader) => {
+              invader.update(grid.velocity)
+        })
+        grid.update()
+    });
     projectiles.forEach((projectile, index) => {
         if(projectile.position.y + projectile.radius < 0){
             projectiles.splice(index, 1)
@@ -119,7 +158,12 @@ const animate = () =>{
     }else{
         player.velocity.x = 0;
     }
-
+    if(frames%randomInterval == 0){
+        randomInterval = Math.floor(Math.random() * 500 + 500)
+        grids.push(new Grid())
+        frames = 0;
+    }
+ frames++;
 }
 addEventListener(("keydown"), ({key}) => {
     switch(key){
