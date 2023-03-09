@@ -87,6 +87,7 @@ class Grid {
         const rows = Math.floor(Math.random() * 5 + 2)
         const columns = Math.floor(Math.random()* 10 + 2)
         this.width = columns * 30;
+        this.height = rows * 30
         for(let i=0; i<columns; i++){
             for(let x=0; x<rows; x++){
                this.invaders.push(new Invader({x: i*30, y: x*30}))
@@ -139,11 +140,30 @@ let randomInterval = Math.floor(Math.random() * 500 + 500)
 const animate = () =>{
     requestAnimationFrame(animate)
     player.update();
-    grids.forEach((grid) => {
-        grid.invaders.forEach((invader) => {
-              invader.update(grid.velocity)
-        })
+    grids.forEach((grid, index) => {
         grid.update()
+        if(grid.position.y + grid.height > canvas.height){
+            grids.splice(index, 1)
+        }
+        grid.invaders.forEach((invader, j) => {
+              invader.update(grid.velocity)
+              projectiles.forEach((projectile, i) => {
+                 if(projectile.position.y + projectile.radius >= invader.position.y && projectile.position.y - projectile.radius <= invader.position.y + invader.height && 
+                    projectile.position.x + projectile.radius >= invader.position.x && projectile.position.x - projectile.radius <= invader.position.x){
+                        let invadersFound = grid.invaders.find(invader2 => {
+                            return invader2 === invader;
+                        })
+                        let projectileFound =  projectiles.find(projectile2 => {
+                            return projectile2 === projectile
+                        })
+                        if(invadersFound && projectileFound){
+                            grid.invaders.splice(j, 1);
+                            projectiles.splice(i, 1);
+                        }
+                }
+              })
+        })
+
     });
     projectiles.forEach((projectile, index) => {
         if(projectile.position.y + projectile.radius < 0){
