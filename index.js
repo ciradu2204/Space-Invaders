@@ -39,6 +39,38 @@ class Player {
     }
 }
 
+class Invader{
+    constructor(){
+        this.velocity = {
+            x: 0,
+            y: 0,
+        }
+        const image = new Image();
+        image.src = "./img/invader.png"
+        image.onload = () => {
+            const scale = 1;
+            this.image = image;
+            this.image.width = image.width * scale;
+            this.image.height = image.height * scale;
+            this.width = this.image.width;
+            this.height = this.image.height;
+            this.position = {
+                x: canvas.width/2 - this.width/2,
+                y: canvas.height/2
+            }
+        }
+    }
+    draw(){
+        c.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
+    }
+    update(){
+        if(this.image){
+            this.position.x  += this.velocity.x;
+            this.position.y += this.velocity.y
+            this.draw()
+        }
+    }
+}
 class Projectile{
     constructor(position, velocity){
         this.position = position;
@@ -61,6 +93,7 @@ class Projectile{
 
 let player = new Player();
 let projectiles =  [];
+let invader = new Invader()
 let keys = {
     arrowRight :{
         pressed: false
@@ -72,6 +105,7 @@ let keys = {
 const animate = () =>{
     requestAnimationFrame(animate)
     player.update();
+    invader.update();
     projectiles.forEach((projectile, index) => {
         if(projectile.position.y + projectile.radius < 0){
             projectiles.splice(index, 1)
