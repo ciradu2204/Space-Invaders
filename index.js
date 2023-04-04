@@ -121,7 +121,7 @@ const show_scores = () => {
 
 const game_over = () => {
     canvas.style.display = "none"
-    document.getElementById("gameOver").display = "flex"
+    document.getElementById("gameOver").style.display = "flex"
 }
 
 addEventListener(("keydown"), ({key}) => {
@@ -159,11 +159,7 @@ addEventListener(("keyup"), ({key}) => {
     }
 })
 const animate = () =>{
-    if(!gameOver){
-        requestAnimationFrame(animate)
-    }else{
-        game_over()
-    }
+    let stopId = requestAnimationFrame(animate)
     player.update();
     show_scores()
     invaders.forEach((invader, i) => {
@@ -182,6 +178,7 @@ const animate = () =>{
         }
         projectile.update()
     })
+
     if(keys.arrowRight.pressed && (player.width + player.position.x <= canvas.width)){
         player.velocity.x = 5;
     }else if(keys.arrowLeft.pressed && player.position.x >= 0){
@@ -201,7 +198,12 @@ const animate = () =>{
         invaders.push(new Invader())
         frames = 0;
     }
- frames++;
+
+    if(gameOver){
+        cancelAnimationFrame(stopId)
+        game_over()
+    }
+    frames++;
 }
 animate()
 
