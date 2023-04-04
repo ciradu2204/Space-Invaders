@@ -121,14 +121,7 @@ const show_scores = () => {
 
 const game_over = () => {
     canvas.style.display = "none"
-    let h1 = document.createElement('h1')
-    h1.innerHTML = "Game Over"
-    h1.style.textAlign = "center"
-    h1.style.display = "flex"
-    h1.style.alignItems = "center"
-    h1.style.justifyContent = "center"
-    document.body.appendChild(h1);
-    document.body.style.height = "100%"
+    document.getElementById("gameOver").display = "flex"
 }
 
 addEventListener(("keydown"), ({key}) => {
@@ -142,7 +135,7 @@ addEventListener(("keydown"), ({key}) => {
             player.update()
             break;
         case " ":
-            projectiles.push(new Projectile({x: player.position.x + player.width/2, y:player.position.y}, {x:0, y: -5}))
+            projectiles.push(new Projectile({x: player.position.x + player.width/2, y:player.position.y + player.height}, {x:0, y: -5}))
             break;
         default:
         break;
